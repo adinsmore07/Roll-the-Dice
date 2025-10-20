@@ -9,17 +9,32 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var randomValue = 0
+    @State private var rotation = 0.0
     var body: some View {
         VStack {
             Text("Dice Roll")
                 .font(.title)
-            Text("\(randomValue)")
-                .font(.system(size: 72))
+            Image("pips \(randomValue)")
+                .resizable()
+                .frame(width: 200, height: 200)
                 .padding()
                 .onTapGesture {
-                    randomValue = Int.random(in: 1...6)
+                    chooseRandom(times: 3)
+                    withAnimation(.interpolatingSpring(Spring(stiffness: 10, damping: 2))) {
+                        rotation += 360
+                    }
                 }
-                Spacer()
+                .rotationEffect(.degrees(rotation))
+                .rotation3DEffect(.degrees(rotation), axis: (x: 1, y: 2, z: 0))
+            Spacer()
+        }
+    }
+    func chooseRandom(times: Int) {
+        if times > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                randomValue = Int.random(in: 1...6)
+                chooseRandom(times: times - 1)
+            }
         }
     }
 }
